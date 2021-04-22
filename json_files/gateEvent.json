@@ -1,0 +1,18 @@
+{
+	"jsonrpc": "2.0",
+	"method": "gateEvent",
+	"params": {
+		"readType": "goodRead",
+		"tags": [
+			{
+				"RSAVG": [
+					-70,
+					0,
+					0,
+					0
+				],
+				"UII": "1000"
+			}
+		]
+	}
+}
