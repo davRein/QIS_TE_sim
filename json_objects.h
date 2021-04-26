@@ -3,6 +3,11 @@
 
 #include <QString>
 #include <QFile>
+#include <QWebSocket>
+#include <QDebug>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 class JSON_Objects
 {
@@ -11,17 +16,16 @@ public:
 
     QString readJsonFile(const QString &filename);
     QString createJsonGateEvent(int nUII);
-    QString getFn_connEstablished() const;
-    QString getFn_gateEvent() const;
-    QString getFn_dir() const;
+    void checkJsonMessage(QString &message, QWebSocket &socket);
+    void readSetOutput(QString &message);
 
 private:
-    QFile file;
-
     const QString fn_dir = "json_files/";
-
     const QString fn_connEstablished = "id_0_result_ok.json";
     const QString fn_gateEvent = "gateEvent.json";
+    const QString fn_resultTrue = "id_1_result_true.json";
+
+    bool m_debug = false;
 };
 
 #endif // JSON_OBJECTS_H

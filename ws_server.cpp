@@ -1,11 +1,12 @@
 #include "ws_server.h"
-#include "QtWebSockets/qwebsocketserver.h"
-#include "QtWebSockets/qwebsocket.h"
-#include <QtCore/QDebug>
-#include <QTimer>
+
 
 QT_USE_NAMESPACE
 
+//! [Constructor]
+//! Creates an object to open websocket connections
+//! @param port: Port on which the server can be addressed
+//! @param debug: toggle true/false for debug output
 WS_Server::WS_Server(quint16 port, bool debug, QObject *parent) :
     QObject(parent),
     m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Echo Server"),
@@ -18,25 +19,26 @@ WS_Server::WS_Server(quint16 port, bool debug, QObject *parent) :
         }
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &WS_Server::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WS_Server::closed);
-
-
     }
 }
 //! [constructor]
 
+//! [destructor]
+//! Don't call it manually, everytime you do a unicorn will die. It may be the last !
 WS_Server::~WS_Server()
 {
     m_pWebSocketServer->close();
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
+//! [destructor]
 
 //! [onNewConnection]
+//! Puts connected clients to thee client list and enables communicatione between server and client
 void WS_Server::onNewConnection()
 {
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &WS_Server::processTextMessage);
-    connect(pSocket, &QWebSocket::binaryMessageReceived, this, &WS_Server::processBinaryMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &WS_Server::socketDisconnected);
 
     m_clients << pSocket;
@@ -45,57 +47,34 @@ void WS_Server::onNewConnection()
     int iClients = m_clients.size();
 
     if(iClients < 2){
-
-        qDebug() << "Timer starts";
         QTimer *timer = new QTimer(this);
-        timer->setInterval(2000);
+        timer->setInterval(3000);
         connect(timer, &QTimer::timeout, this, &WS_Server::processTimeout);
-        // Start timer, timeout is 5 sec
-        timer->start(2000);
+        // Start timer, timeout is 3 sec
+        timer->start(3000);
     }
 }
 //! [onNewConnection]
 
 //! [processTextMessage]
+//! Receives incoming messages and check their content to decide which method to be call as next
+//! @param message: Sent message(s) from the client
 void WS_Server::processTextMessage(QString message)
 {
-
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    if (!m_debug)
-        qDebug() << "Message received:" << message;
-
-    if(message.contains("gate")){
-        pClient->sendTextMessage(obj.readJsonFile(obj.getFn_dir() + obj.getFn_connEstablished()));
-        connGateEstablished = true;
-        QTime t = QTime::currentTime();
-        qDebug() << "Connection to Dummy Gate App established at " + t.toString();
-    } else if(message.contains("iocontrol")){
-        pClient->sendTextMessage(obj.readJsonFile(obj.getFn_dir() + obj.getFn_connEstablished()));
-        connGateEstablished = true;
-        QTime t = QTime::currentTime();
-        qDebug() << "Connection to Dummy IO-Control established at " + t.toString();
-    }
+    obj.checkJsonMessage(message, *pClient);
 }
 //! [processTextMessage]
 
-//! [processBinaryMessage]
-void WS_Server::processBinaryMessage(QByteArray message)
-{
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    if (m_debug)
-        qDebug() << "Binary Message received:" << message;
-    if (pClient) {
-        pClient->sendBinaryMessage(message);
-    }
-}
-//! [processBinaryMessage]
 
 //! [socketDisconnected]
+//! Disconnects the websocket
 void WS_Server::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    if (m_debug)
+    if (m_debug){
         qDebug() << "socketDisconnected:" << pClient;
+    }
     if (pClient) {
         m_clients.removeAll(pClient);
         pClient->deleteLater();
@@ -105,6 +84,7 @@ void WS_Server::socketDisconnected()
 
 
 //! [processTimeout]
+//! Generates every 3 sec a gateEvent with a random UII between 1 und 3000
 void WS_Server::processTimeout() {
     if(m_clients.isEmpty()){
         m_pWebSocketServer->disconnect();
@@ -113,7 +93,6 @@ void WS_Server::processTimeout() {
       QWebSocket *pID_Check = m_clients.first();
       if (pID_Check) {
           nCounter++;
-          qDebug() << "Sent";
           pID_Check->sendTextMessage(obj.createJsonGateEvent((rand() % 3000 + 1)));
         }
     }

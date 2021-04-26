@@ -4,6 +4,10 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
+#include "QtWebSockets/qwebsocketserver.h"
+#include "QtWebSockets/qwebsocket.h"
+#include <QtCore/QDebug>
+#include <QTimer>
 #include "json_objects.h"
 
 
@@ -23,7 +27,6 @@ Q_SIGNALS:
 private Q_SLOTS:
     void onNewConnection();
     void processTextMessage(QString message);
-    void processBinaryMessage(QByteArray message);
     void socketDisconnected();
     void processTimeout();
 
@@ -31,7 +34,7 @@ private:
     QWebSocket *messageSocket;
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
-    bool m_debug;
+    bool m_debug = false;
     bool connGateEstablished;
     int nCounter;
     JSON_Objects obj;
