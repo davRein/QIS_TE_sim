@@ -10,6 +10,7 @@ CONFIG -= app_bundle
 
 SOURCES += \
         json_objects.cpp \
+        jsonprotocols.cpp \
         main.cpp \
         ws_server.cpp
 
@@ -20,4 +21,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     json_objects.h \
+    jsonprotocols.h \
     ws_server.h

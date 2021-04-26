@@ -93,7 +93,8 @@ void WS_Server::processTimeout() {
       QWebSocket *pID_Check = m_clients.first();
       if (pID_Check) {
           nCounter++;
-          pID_Check->sendTextMessage(obj.createJsonGateEvent((rand() % 3000 + 1)));
+          int nUII = (rand() % 3000 + 1);
+          pID_Check->sendTextMessage(protocols.createJson_method_gateEvent(readType, nUII));
         }
     }
 }

@@ -8,6 +8,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include "jsonprotocols.h"
 
 class JSON_Objects
 {
@@ -20,12 +21,12 @@ public:
     void readSetOutput(QString &message);
 
 private:
-    const QString fn_dir = "json_files/";
-    const QString fn_connEstablished = "id_0_result_ok.json";
-    const QString fn_gateEvent = "gateEvent.json";
-    const QString fn_resultTrue = "id_1_result_true.json";
-
     bool m_debug = false;
+    JsonProtocols protocols;
+
+    // TMP
+    int nTmp = 1;
+    bool fResult = true;
 };
 
 #endif // JSON_OBJECTS_H

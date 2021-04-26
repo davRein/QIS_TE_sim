@@ -9,6 +9,7 @@
 #include <QtCore/QDebug>
 #include <QTimer>
 #include "json_objects.h"
+#include "jsonprotocols.h"
 
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
@@ -38,5 +39,7 @@ private:
     bool connGateEstablished;
     int nCounter;
     JSON_Objects obj;
+    JsonProtocols protocols;
+    QString readType = "goodRead";
 };
 #endif // WS_SERVER_H
